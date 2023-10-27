@@ -68,7 +68,10 @@ export default function Nav() {
           </svg>
           Products
         </Link>
-        <Link href={"/orders"} className={inactiveLink}>
+        <Link
+          href={"/orders"}
+          className={pathname.includes("/orders") ? activeLink : inactiveLink}
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -85,7 +88,10 @@ export default function Nav() {
           </svg>
           Orders
         </Link>
-        <Link href={"/settings"} className={inactiveLink}>
+        <Link
+          href={"/settings"}
+          className={pathname.includes("/settings") ? activeLink : inactiveLink}
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
