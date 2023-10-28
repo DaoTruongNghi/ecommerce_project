@@ -5,16 +5,16 @@ import { redirect } from "next/dist/server/api-utils";
 import { useRouter } from "next/router";
 
 export default function NewProduct() {
-  // Mag State
+  // State
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
   const [goToProducts, setGoToProducts] = useState(false);
 
-  // routrer
+  // Routrer
   const router = useRouter();
 
-  //handler createProduct data
+  // Handler createProduct data
   async function createProduct(ev) {
     ev.preventDefault();
     const data = { title, description, price };
