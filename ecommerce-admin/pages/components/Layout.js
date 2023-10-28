@@ -2,7 +2,7 @@ import Head from "next/head";
 import Image from "next/image";
 import styles from "@/styles/Home.module.css";
 import { useSession, signIn, signOut } from "next-auth/react";
-import Nav from "./nav";
+import Nav from "./Nav";
 
 export default function Layout({ children }) {
   const { data: session } = useSession();
