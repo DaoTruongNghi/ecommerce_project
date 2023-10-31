@@ -1,7 +1,6 @@
 import axios from "axios";
 import Layout from "../components/Layout";
 import { useState } from "react";
-import { redirect } from "next/dist/server/api-utils";
 import { useRouter } from "next/router";
 
 export default function ProductForm({
@@ -9,10 +8,11 @@ export default function ProductForm({
   title: existingTitle,
   description: existingDescription,
   price: existingPrice,
-  images,
+  images: existingImages,
 }) {
   // State
   const [title, setTitle] = useState(existingTitle || "");
+  const [images, setImages] = useState(existingImages || []);
   const [description, setDescription] = useState(existingDescription || "");
   const [price, setPrice] = useState(existingPrice || "");
   const [goToProducts, setGoToProducts] = useState(false);
@@ -23,7 +23,7 @@ export default function ProductForm({
   // Handler createProduct data
   async function saveProduct(ev) {
     ev.preventDefault();
-    const data = { title, description, price };
+    const data = { title, description, price, images };
     if (_id) {
       // update product
       await axios.put("/api/products", { ...data, _id });
@@ -36,14 +36,23 @@ export default function ProductForm({
 
   if (goToProducts) router.push("/products");
 
+  // Handler upload Images
   async function uploadImages(ev) {
+    // FileList is repersent for list files have already upload from a form
     const files = ev.target?.files;
     if (files?.length > 0) {
       const data = new FormData();
-      console.log(files);
-      files.forEach((file) => data.append("file", file));
+      for (const file of files) {
+        data.append("file", file);
+      }
+      // const res = await axios.post("/api/upload", data, {
+      //   headers: { "Content-Type": "multipart/-form-data" },
+      // });
+      console.log(data);
       const res = await axios.post("/api/upload", data);
-      console.log(res.data);
+      setImages((oldImages) => {
+        return [...oldImages, ...res.data.links];
+      });
     }
   }
   return (
@@ -56,7 +65,14 @@ export default function ProductForm({
         onChange={(ev) => setTitle(ev.target.value)}
       />
       <label>Photos</label>
-      <div className="mb-2">
+      <div className="flex flex-wrap gap-2 mb-2">
+        {/* Create a image upload in after */}
+        {!!images?.length &&
+          images.map((link) => (
+            <div key={link} className="h-24">
+              <img src={link} alt="" className="rounded-lg"></img>
+            </div>
+          ))}
         <label
           className="w-24 h-24 flex flex-col justify-center 
           items-center rounded-lg text-sm text-gray-600 gap-1

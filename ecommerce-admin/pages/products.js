@@ -5,7 +5,6 @@ import Layout from "./components/Layout";
 
 export default function Products() {
   const [products, setProducts] = useState([]);
-
   useEffect(() => {
     axios.get("/api/products").then((response) => {
       // console.log(response.data);
