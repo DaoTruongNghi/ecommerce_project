@@ -3,6 +3,7 @@ import Image from "next/image";
 import styles from "@/styles/Home.module.css";
 import { useSession, signIn, signOut } from "next-auth/react";
 import Nav from "./Nav";
+import { data } from "autoprefixer";
 
 export default function Layout({ children }) {
   const { data: session } = useSession();

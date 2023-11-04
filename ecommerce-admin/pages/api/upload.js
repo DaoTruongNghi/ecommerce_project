@@ -13,7 +13,6 @@ export default async function handle(req, res) {
       resolve({ fields, files });
     });
   });
-  console.log(fields, files);
 
   const client = new S3Client({
     region: "ap-southeast-2",

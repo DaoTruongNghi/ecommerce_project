@@ -76,7 +76,7 @@ export default function ProductForm({
       />
       <label>Photos</label>
       <div className="flex flex-wrap gap-2 mb-2">
-        {/* Create a image upload in after */}
+        {/* Create a image upload and handle moving image in after */}
         <ReactSortable
           className="flex flex-wrap gap-1"
           list={images}
