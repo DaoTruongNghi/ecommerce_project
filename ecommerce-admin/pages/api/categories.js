@@ -14,7 +14,7 @@ export default async function handle(req, res) {
     const { name, parentCategories } = req.body;
     const categoryDoc = await Category.create({
       name,
-      parent: parentCategories,
+      parent: null ? null : parentCategories,
     });
     res.json(categoryDoc);
   }
@@ -29,6 +29,12 @@ export default async function handle(req, res) {
       }
     );
     res.json(categoryDoc);
+  }
+
+  if (method === "DELETE") {
+    const { _id } = req.query;
+    await Category.deleteOne({ _id });
+    res.json("ok");
   }
 
   // Trong trường hợp updateOne, parent: parentCategories sẽ cập nhật trường "parent" của bản ghi bằng giá trị parentCategories.
