@@ -4,29 +4,34 @@ import axios from "axios";
 import { withSwal } from "react-sweetalert2";
 
 function Categories({ swal }) {
+  // State
   const [name, setName] = useState("");
   const [parentCategories, setParentCategories] = useState("");
   const [categories, setCategories] = useState([]);
   const [editedCategories, setEditedCategories] = useState(null);
   const [properties, setProperties] = useState([]);
 
+  // useEffect();
   useEffect(() => {
     fetchCategories();
   }, []);
 
+  // Handle get data in mongodb for table
   function fetchCategories() {
     axios.get("/api/categories").then((result) => setCategories(result.data));
   }
 
+  // Handle async save categories
   async function saveCategory(ev) {
     ev.preventDefault();
-    if (parentCategories === "no-parent-category") {
-      categories.parent = null;
-    } else {
-      categories.parent = parentCategories;
-    }
-
-    const data = { name, parentCategories };
+    const data = {
+      name,
+      parentCategories,
+      properties: properties.map((p) => ({
+        name: p.name,
+        value: p.value.split(","),
+      })),
+    };
 
     if (editedCategories) {
       data._id = editedCategories._id;
@@ -35,16 +40,29 @@ function Categories({ swal }) {
     } else {
       await axios.post("/api/categories", data);
     }
+    // Update state when POST http done !
     setName("");
+    setParentCategories("");
+    setProperties([]);
+
+    // Fetch data after the states change
     fetchCategories();
   }
 
+  // Handle edit categories
   function editCategory(categories) {
     setEditedCategories(categories);
     setName(categories.name);
     setParentCategories(categories.parent?._id);
+    setProperties(
+      categories.properties.map(({ name, value }) => ({
+        name,
+        value: value.join(","),
+      }))
+    );
   }
 
+  // Handle delete categories
   function deleteCategories(categories) {
     swal
       .fire({
@@ -75,12 +93,14 @@ function Categories({ swal }) {
       });
   }
 
+  // Handle add properties
   function addProperty() {
     setProperties((prev) => {
       return [...prev, { name: "", value: "" }];
     });
   }
 
+  // Handle change name in field input
   function handlePropertyNameChange(index, property, newName) {
     setProperties((prev) => {
       const properties = [...prev];
@@ -89,6 +109,7 @@ function Categories({ swal }) {
     });
   }
 
+  // Handle change value in field input
   function handlePropertyValueChange(index, property, newValue) {
     setProperties((prev) => {
       const properties = [...prev];
@@ -97,6 +118,7 @@ function Categories({ swal }) {
     });
   }
 
+  // Handle remove properties field input
   function removeProperty(indexToRemove) {
     setProperties((prev) => {
       return [...prev].filter((p, pIndex) => {
@@ -123,13 +145,9 @@ function Categories({ swal }) {
           />
           <select
             value={parentCategories}
-            onChange={(ev) =>
-              ev.target.value === "no-parent-category"
-                ? setParentCategories(null)
-                : setParentCategories(ev.target.value)
-            }
+            onChange={(ev) => setParentCategories(ev.target.value)}
           >
-            <option value="no-parent-category">No parent category</option>
+            <option value="">No parent category</option>
             {categories?.length > 0 &&
               categories.map((category) => (
                 <option value={category._id}>{category.name}</option>
@@ -176,45 +194,61 @@ function Categories({ swal }) {
               </div>
             ))}
         </div>
+        {editedCategories && (
+          <button
+            onClick={() => {
+              setEditedCategories(null);
+              setName("");
+              setParentCategories("");
+              setProperties([]);
+            }}
+            className="btn-default mr-2"
+            type="button"
+          >
+            Cancel
+          </button>
+        )}
         <button type={"submit"} className="btn-primary py-1">
           Save
         </button>
       </form>
-      <table className="basic mt-4">
-        <thead>
-          <tr>
-            <td>Category name</td>
-            <td>Parent categories</td>
-            <td></td>
-          </tr>
-        </thead>
+      {!editedCategories && (
+        <table className="basic mt-4">
+          <thead>
+            <tr>
+              <td>Category name</td>
+              <td>Parent categories</td>
+              <td></td>
+            </tr>
+          </thead>
 
-        <tbody>
-          {categories?.length > 0 &&
-            categories.map((category) => (
-              <tr>
-                <td>{category.name}</td>
-                <td>{category?.parent?.name}</td>
-                <td>
-                  <div className="flex gap-1">
-                    <button
-                      className="btn-primary "
-                      onClick={() => editCategory(category)}
-                    >
-                      Edit
-                    </button>
-                    <button
-                      className="btn-primary"
-                      onClick={() => deleteCategories(category)}
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-        </tbody>
-      </table>
+          <tbody>
+            {categories?.length > 0 &&
+              categories.map((category) => (
+                <tr>
+                  <td>{category.name}</td>
+                  <td>{category?.parent?.name}</td>
+                  <td>
+                    <div className="flex gap-1">
+                      <button
+                        className="btn-primary "
+                        onClick={() => editCategory(category)}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        className="btn-primary"
+                        onClick={() => deleteCategories(category)}
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+          </tbody>
+        </table>
+      )}
     </Layout>
   );
 }

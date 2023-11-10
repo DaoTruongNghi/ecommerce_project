@@ -1,10 +1,14 @@
 import fs, { link } from "fs";
 import mime from "mime-types";
 import multiparty from "multiparty";
+import { isAdminRequest } from "@/pages/api/auth/[...nextauth]";
+import { mongooseConnect } from "@/lib/mongoose";
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 const bucketName = "jnghi-next-ecomerce";
 
 export default async function handle(req, res) {
+  await mongooseConnect();
+  await isAdminRequest(req, res);
   const form = new multiparty.Form();
 
   const { fields, files } = await new Promise((resolve, reject) => {

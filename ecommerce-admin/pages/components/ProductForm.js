@@ -12,12 +12,16 @@ export default function ProductForm({
   price: existingPrice,
   images: existingImages,
   category: assignedCategory,
+  properties: assignedProperties,
 }) {
   // State
   const [title, setTitle] = useState(existingTitle || "");
   const [images, setImages] = useState(existingImages || []);
   const [description, setDescription] = useState(existingDescription || "");
   const [category, setCategory] = useState(assignedCategory || "");
+  const [productProperties, setProductProperties] = useState(
+    assignedProperties || {}
+  );
   const [price, setPrice] = useState(existingPrice || "");
   const [goToProducts, setGoToProducts] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -36,7 +40,14 @@ export default function ProductForm({
   // Handler createProduct data
   async function saveProduct(ev) {
     ev.preventDefault();
-    const data = { title, description, price, images, category };
+    const data = {
+      title,
+      description,
+      price,
+      images,
+      category,
+      properties: productProperties,
+    };
     if (_id) {
       // update product
       await axios.put("/api/products", { ...data, _id });
@@ -76,6 +87,34 @@ export default function ProductForm({
     }
   }
 
+  function setProductProp(propName, value) {
+    setProductProperties((prev) => {
+      const newProductProps = { ...prev };
+      newProductProps[propName] = value;
+      return newProductProps;
+    });
+  }
+
+  // Handle categories&properties in select fearture
+  const propertiesToFill = [];
+  // 1. Handler Properties and push it in propertiesToFill array
+  if (categories.length > 0 && category) {
+    let catInfo = categories.find(({ _id }) => _id === category);
+    propertiesToFill.push(...catInfo.properties);
+    // 2. Check it if these have parent properties, then push it in to
+    // propertiesToFill array
+    // while (catInfo?.parent?._id) {
+    //   const parentCat = categories.find(
+    //     ({ _id }) => _id === catInfo?.parent?._id
+    //   );
+    //   propertiesToFill.push(parentCat);
+    // 2.1. Finally update catInfo to cursor in parentCat and
+    // keep the loop start begin until catInfo?.parent?._id doesn't exits,
+    // that mean no Parent Category or may be Parent Category don't have any _id
+    //   catInfo = parentCat;
+    // }
+  }
+
   return (
     <form onSubmit={saveProduct}>
       <label>Product name</label>
@@ -95,6 +134,19 @@ export default function ProductForm({
             </option>
           ))}
       </select>
+      {propertiesToFill.length > 0 &&
+        propertiesToFill.map((p) => (
+          <div className="flex gap-1">
+            <div>{p.name}</div>
+            <select
+              value={productProperties[p.name]}
+              onChange={(ev) => setProductProp(p.name, ev.target.value)}
+            >
+              <option value="">No Select</option>
+              {p.value && p.value.map((v) => <option value={v}>{v}</option>)}
+            </select>
+          </div>
+        ))}
       <label>Photos</label>
       <div className="flex flex-wrap gap-2 mb-2">
         {/* Create a image upload and handle moving image in after */}
@@ -157,6 +209,13 @@ export default function ProductForm({
 
       <button type="submit" className="btn-primary">
         Save
+      </button>
+      <button
+        type="button"
+        className="btn-default ml-2"
+        onClick={() => setGoToProducts(true)}
+      >
+        Cancel
       </button>
     </form>
   );

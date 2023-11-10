@@ -2,7 +2,8 @@ const { model, models, Schema, mongoose } = require("mongoose");
 
 const CategorySchema = new Schema({
   name: { type: String, required: true },
-  parent: { type: mongoose.Types.ObjectId, ref: "Category", default: null },
+  parent: { type: mongoose.Types.ObjectId, ref: "Category" },
+  properties: [{ type: Object }],
 });
 
 export const Category = models?.Category || model("Category", CategorySchema);

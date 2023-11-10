@@ -4,7 +4,19 @@ import Layout from "./components/Layout";
 export default function Home() {
   const { data: session } = useSession();
   // console.log(session);
-  if (!session) return;
+  if (!session)
+    return (
+      <div className="bg-blue-900 w-screen h-screen flex items-center">
+        <div className="text-center w-full">
+          <button
+            onClick={() => signIn("google")}
+            className="p-2 px-4 bg-white rounded-lg"
+          >
+            Login with google
+          </button>
+        </div>
+      </div>
+    );
   return (
     <Layout>
       <div className="text-blue-900 flex justify-between">

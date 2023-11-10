@@ -1,9 +1,12 @@
 import { mongooseConnect } from "@/lib/mongoose";
 import { Category } from "@/models/Category";
+import { getServerSession } from "next-auth";
+import { authOptions, isAdminRequest } from "@/pages/api/auth/[...nextauth]";
 
 export default async function handle(req, res) {
   const { method } = req;
   await mongooseConnect();
+  await isAdminRequest(req, res);
 
   if (method === "GET") {
     const getData = await Category.find().populate("parent");
@@ -11,21 +14,23 @@ export default async function handle(req, res) {
   }
 
   if (method === "POST") {
-    const { name, parentCategories } = req.body;
+    const { name, parentCategories, properties } = req.body;
     const categoryDoc = await Category.create({
       name,
-      parent: null ? null : parentCategories,
+      parent: parentCategories || undefined,
+      properties,
     });
     res.json(categoryDoc);
   }
 
   if (method === "PUT") {
-    const { name, parentCategories, _id } = req.body;
+    const { name, parentCategories, properties, _id } = req.body;
     const categoryDoc = await Category.updateOne(
       { _id },
       {
         name,
-        parent: parentCategories,
+        parent: parentCategories || null,
+        properties,
       }
     );
     res.json(categoryDoc);
