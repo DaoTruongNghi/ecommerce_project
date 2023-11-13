@@ -5,7 +5,7 @@ export default function NewProduct() {
   return (
     <>
       <Layout>
-        <h1 className="text-blue-900 mb-2 text-xl">New product</h1>
+        <h1>New product</h1>
         <ProductForm />
       </Layout>
     </>

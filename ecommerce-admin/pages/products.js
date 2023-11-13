@@ -14,10 +14,7 @@ export default function Products() {
 
   return (
     <Layout>
-      <Link
-        className="bg-blue-900 text-white rounded-md py-2 px-2 "
-        href="/products/new"
-      >
+      <Link className="btn-primary" href="/products/new">
         Add new products
       </Link>
       <table className="basic mt-4">
@@ -34,7 +31,7 @@ export default function Products() {
               <td>
                 <Link
                   href={"/products/edit/" + product._id}
-                  className="flex items-center"
+                  className="flex items-center btn-default"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -54,7 +51,7 @@ export default function Products() {
                 </Link>
                 <Link
                   href={"/products/delete/" + product._id}
-                  className="flex items-center"
+                  className="flex items-center btn-red"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
